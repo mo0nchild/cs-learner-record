@@ -151,7 +151,7 @@
             catch (AggregateException error) when (error.InnerException is TransferException)
             {
                 this.Logger.LogInformation($"{error.Message}");
-                JS.InvokeVoidAsync("invoke_exception", message).AsTask().Wait();
+                JS.InvokeVoidAsync("invoke_exception", error.Message).AsTask().Wait();
 
                 this.is_loading = false; navigation.NavigateTo("/", true);
                 return;
