@@ -1,0 +1,68 @@
+﻿# docker-compose tool version tag-name / default
+version: "3"
+
+# docker-compose service's collection name 
+name: rabbitmq_http_service
+
+# connection of application services / containers
+services:
+  
+  # docker service for data transfer to 1C HTTP service
+  http_proxy_service:
+
+    container_name: http_proxy_service
+    
+    image: mo0nchild/http_proxy_service:latest
+
+    build: # build docker image (Dockerfile) for http-proxy-service
+      dockerfile: ./HttpProxyService/Dockerfile
+      context: ../
+
+    # application environment variable forwarding to proxy service
+    environment:
+
+      RABBITMQ_HOST: host.docker.internal
+      1CHTTP_HOST: http://host.docker.internal/Institute/hs/student_info
+      
+      INPUT_PATH: InputQueue
+      OUTPUT_PATH: OutputExchange
+
+      HTTP_TIMEOUT: 3000
+      HANDLER_TIMER: 20000
+
+    # deploy settings for service / container entity
+    deploy:
+      resources:
+
+        # service docker machine resourse limits
+        limits:
+          cpus: '0.40'
+          memory: 512M
+
+    ports: # proxy application port forwarding
+      - "3000:8000/tcp"
+
+    # service / container host network usage
+    # network_mode: host
+    restart: always
+
+    # service / container wait while rabbitmq_broker service start
+    depends_on: 
+      - rabbitmq_broker
+
+  # docker service for RabbitMQ Broker Server
+  rabbitmq_broker:
+  
+    container_name: rabbitmq_service
+
+    # docker service for RabbitMQ Broker Server
+    image: kovshik/rabbirservice:latest
+    hostname: kovshik
+
+    restart: always
+    ports: # broker port forwarding
+      - "15672:15672/tcp"
+      - "5672:5672/tcp"
+
+    volumes: # docker volume for database RabbitMQ Server
+      - ./rabbitmq-database:/var/lib/rabbitmq

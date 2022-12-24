@@ -1,0 +1,55 @@
+﻿body {
+    background: linear-gradient(to right, #FFFFFF, #ECE9E6);
+    padding: 0;
+    margin: 0;
+    font-family: 'Lato', sans-serif;
+    color: #000;
+}
+
+.student-profile .card {
+    border-radius: 10px;
+}
+
+.student-profile .card {
+    border-radius: 10px;
+}
+
+    .student-profile .card h3 {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .student-profile .card p {
+        font-size: 16px;
+        color: #000;
+    }
+
+.student-profile .table tbody th,
+.student-profile .table tbody td {
+    font-size: 14px;
+    padding: 5px 10px;
+    color: #000;
+}
+
+.student-profile .card .card-header .profile_img {
+    width: 250px;
+    height: 250px;
+    object-fit: cover;
+    margin: 10px auto;
+    border: 5px solid #ccc;
+    border-radius: 50%;
+}
+
+.profile {
+    position: sticky;
+    top: 0px;
+}
+
+.header {
+    padding: 5px;
+    border: 1px solid #DFE2E6;
+}
+
+.card-body table, .card-body h5 {
+    width: 100%;
+}

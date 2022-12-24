@@ -1,0 +1,58 @@
+﻿.login-page .box {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    height: 100%;
+}
+
+.login-page .box .form-head h2 {
+    text-align: center;
+    margin: 10px 0px 20px;
+}
+
+.login-page .box .form-body input {
+    height: 30px;
+    margin-bottom: 20px;
+    width: 100%;
+    background-color: transparent;
+    border: 2px solid #A0A0A0;
+    text-align: center;
+}
+
+.login-page .box .form-body input:focus {
+    box-shadow: 0px 0px 10px #A0A0A0;
+}
+
+.login-page .box .form-footer {
+    text-align: center;
+}
+
+.login-page .box .form-footer button {
+    height: 30px;
+    padding: 0px 25px;
+    cursor: pointer;
+}
+
+.login-page .box .form-footer button:hover {
+    box-shadow: 0px 0px 10px #A0A0A0;
+}
+svg path,
+svg rect {
+    fill: #75B8FA;
+}
+.loader {
+    margin: 0 0 2em;
+    height: 100px;
+    width: 20%;
+    text-align: center;
+    padding: 1em;
+    margin: 0 auto 1em;
+    display: inline-block;
+    vertical-align: top;
+}
+.card-body {
+    text-align: center;
+    width: 80%;
+    margin: 0 auto;
+}
