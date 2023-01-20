@@ -160,11 +160,18 @@
             {
                 { "request_type", "statements" }, { "Код", DataPackage![0][0]["Код"] }
             };
-            var resultDiscipline = this.TransferController.SendMessage("InputExchange", "OutputExchange", 
-                messageDiscipline, cancel_sourse.Token);
-            if (resultDiscipline.Result == null) return;
+            List<Dictionary<string, object>> result_messageD = default!;
+            try {
+                var resultDiscipline = this.TransferController.SendMessage("InputExchange", "OutputExchange", 
+                    messageDiscipline, cancel_sourse.Token);
+                if (resultDiscipline.Result == null) return;
 
-            var result_messageD = resultDiscipline!.Result!.JsonRecord;
+                result_messageD = resultDiscipline!.Result!.JsonRecord;
+            }
+            catch(AggregateException error) when (error.InnerException is TransferException)
+            {
+                this.Logger.LogInformation($"{error.Message}");
+            }
             DataPackage![1] = result_messageD;
 
             sessionStorage.SetItemAsync("DataPackage", DataPackage).AsTask().Wait();

@@ -20,16 +20,17 @@ namespace ClientTest
 
             var message = new Dictionary<string, object>()
             {
-                { "request_type", "authorization" },
-                { "Логин", "uraniaa" },
-                { "Пароль", "12345asdasdasd" }
+                { "request_type", "statements" },
+                { "Код", "000000003" },
+                //{ "Логин", "uraniaa" },
+                //{ "Пароль", "12345" }
             };
             using var cancel_sourse = new CancellationTokenSource();
             try {
                 var result = rabbit_client.SendMessage("InputExchange", "OutputExchange", message,
                     cancel_sourse.Token);
 
-                cancel_sourse.Cancel();
+                //cancel_sourse.Cancel();
                 if (result.Result == null) { Console.WriteLine("\n\tCANCELED\n"); return; }
 
                 Console.WriteLine("\n");
@@ -41,6 +42,8 @@ namespace ClientTest
             }
             catch(AggregateException error) when (error.InnerException is TransferException)
             {
+                Console.WriteLine("\n");
+
                 Console.WriteLine($"{error.Message}");
             }
         }

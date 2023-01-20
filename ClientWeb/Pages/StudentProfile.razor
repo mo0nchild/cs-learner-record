@@ -37,6 +37,8 @@
             <p class="mb-0"><strong class="pr-1">Код:</strong>@Student[0]["Код"]</p>
             <p class="mb-0"><strong class="pr-1">Группа:</strong>@Student[0]["Группа"]</p>
             <p class="mb-0"><strong class="pr-1">Курс:</strong>@Student[0]["Курс"]</p>
+            <p class="mb-0"><strong class="pr-1">Подготовка:</strong>@Student[0]["Подготовка"]</p>
+            <p class="mb-0"><strong class="pr-1">Факультет:</strong>@Student[0]["Факультет"]</p>
           </div>
           }
         </div>
@@ -48,18 +50,25 @@
           </div>
           <div class="card-body pt-0">
             <table>
-                @if (Discipline != null){
-                @for (int i = 0; i < Discipline.Count - 1;i++)
-                {
-                    <h5 class="header">Курс: @Discipline[i]["Курс"]</h5>
-                    <table class="table table-bordered">
-                            <tr>
-                                <th width="30%">Дисциплина: @Discipline[i]["Дисциплина"]</th>
-                                <td width="2%">Оценка: @Discipline[i]["Оценка"]</td>
-                            </tr>
-                    </table>
-                }
-            }
+                            @if (Discipline != null) {
+                                @for (int i = 0; i < Discipline.Count - 1; i++)
+                                {
+                                    <h5 class="header">Период контроля: @Discipline[i]["Период_контроля"]</h5>
+                                    <table class="table table-bordered">
+                                        <tr>
+                                            <td width="20%">Дисциплина: @Discipline[i]["Дисциплина"]</td>
+                                            <td width="20%">Вид контроля: @Discipline[i]["Вид_контроля"]</td>
+                                            <td width="20%">Дата занятия: @Discipline[i]["Дата_занятия"]</td>
+                                            <td width="20%">Время начала: @Discipline[i]["Время_начала"]</td>
+                                            <td width="15%">Оценка: @Discipline[i]["Оценка"]</td>
+                                            <td width="20%">Преподаватель: @Discipline[i]["Преподаватель"]</td>
+                                        </tr>
+                                    </table>
+                                }
+                            }
+                            else{
+                                <h5>Доступные дисциплины отсутствуют</h5>
+                            }
            </table>
           </div>
         </div>
