@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using TransferLibrary.NetworkTransfer;
 using System.Threading;
 using Newtonsoft.Json.Linq;
+using System.Net;
 
 namespace TransferLibrary.Export
 {
@@ -21,8 +22,23 @@ namespace TransferLibrary.Export
         public TransferException(System.String message) : base(message) { }
     }
 
+    public class RequestType : System.Object
+    {
+        public System.String RequestValue { get; private set; } = default!;
+        public RequestType(string state) : base() => this.RequestValue = state;
+
+
+        public readonly static RequestType Authorization = new("authorization");
+
+        public readonly static RequestType Orders = new("orders");
+
+        public readonly static RequestType Statements = new("statements");
+    }
+
     public static class ExportTransfer : System.Object
     {
+        private const System.String InputExchange = "InputExchange", OutputExchange = "OutputExchange";
+
         public static System.String HttpHostname { get; set; } = "http://localhost:8080";
         public static System.String RabbitHostname { get; set; } = "localhost";
 
@@ -44,15 +60,16 @@ namespace TransferLibrary.Export
                     return new NetworkTransfer.HttpTransfer(required_service, ExportTransfer.HttpHostname);
                 });
         }
-        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer, string input_exchange,
-            string output_exchange, Dictionary<string, object> message, CancellationToken token)
+        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer,
+            Dictionary<string, object> message, CancellationToken token, string input_exchange = InputExchange,
+            string output_exchange = OutputExchange)
         {
             if (message == null || message.ContainsKey("request_type") == false)
             { throw new Export.TransferException("ERROR: INPUT MESSAGE SET NOT CORRECTLY"); }
 
             message.Add("response_path", rabbit_transfer.RabbitID);
 
-            var message_json = new IRabbitTransfer.MessageJson() { JsonRecord = new () { message } };
+            var message_json = new IRabbitTransfer.MessageJson() { JsonRecord = new() { message } };
             IRabbitTransfer.MessageJson? request_result = default;
 
             return Task<IRabbitTransfer.MessageJson?>.Run(delegate () {
@@ -72,6 +89,13 @@ namespace TransferLibrary.Export
 
                 return request_result;
             });
-        } 
+        }
+        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer, RequestType type,
+            string person_id, CancellationToken token, string input_exchange = InputExchange,
+            string output_exchange = OutputExchange)
+        {
+            return rabbit_transfer.SendMessage(new () { { "request_type", type.RequestValue }, { "Код", person_id } }, 
+                token, input_exchange, output_exchange);
+        }
     }
 }

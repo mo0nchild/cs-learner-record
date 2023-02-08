@@ -81,6 +81,8 @@ namespace HttpProxyService.ProxyService
                     http_result = this.HttpTransfer.SendRequest<IRabbitTransfer.MessageJson>(
                         result_message.message_body.JsonRecord[0], result_message.request_type, HttpTimeout);
 
+                    http_result.JsonRecord.Add(new() { ["responce_time"] = DateTime.Now });
+
                     if (http_result.JsonRecord == null || http_result.JsonRecord.Count == 0)
                     { throw new IHttpTransfer.HttpTransferException("ERROR: SERVER PROCESS ERROR"); }
                 }
