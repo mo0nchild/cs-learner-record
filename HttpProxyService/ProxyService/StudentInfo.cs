@@ -8,7 +8,8 @@ using System.Threading.Tasks;
 
 namespace HttpProxyService.ProxyService
 {
-    public sealed class StudentInfo : System.Object
+    [type: System.ObsoleteAttribute()]
+    public sealed class StudentInfoData : System.Object
     {
         [JsonPropertyName("Код")] public System.String Code { get; set; } = default!;
         [JsonPropertyName("ФИО")] public System.String Name { get; set; } = default!;

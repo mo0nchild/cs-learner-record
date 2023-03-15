@@ -1,0 +1,59 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "HttpProxyService.GrpsTransfer";
+
+import "google/protobuf/wrappers.proto";
+import "google/protobuf/duration.proto"; 
+import "google/protobuf/timestamp.proto";
+
+package fetch_data;
+
+service FetchData {
+	rpc GetProfileData (RequestData) returns (ProfileData);
+	rpc GetProfileStatement (RequestData) returns (ProfileStatement);
+}
+
+message RequestData {
+	google.protobuf.StringValue student_gradeBook = 1;
+}
+
+message ProfileData {
+	google.protobuf.StringValue gradeBook = 1;
+
+	google.protobuf.StringValue firstName = 2;
+	google.protobuf.StringValue lastName = 3;
+	google.protobuf.StringValue patronymic = 4;
+
+	google.protobuf.StringValue group = 5;
+	google.protobuf.StringValue tuitionType = 6;
+
+	google.protobuf.StringValue tuitionForm = 7;
+	google.protobuf.StringValue trainingLevel = 8;
+
+	google.protobuf.StringValue speciality = 9;
+	google.protobuf.StringValue specialization = 10;
+
+	google.protobuf.StringValue course = 11;
+	google.protobuf.StringValue id = 12;
+
+	google.protobuf.StringValue studentStatus = 13;
+}
+
+message ProfileStatement {
+
+	message StatementInfo {
+		google.protobuf.StringValue semestrNumber = 1;
+
+		google.protobuf.StringValue teacherId = 2;
+		google.protobuf.StringValue teacherFullName = 3;
+
+		google.protobuf.StringValue subject = 4;
+		google.protobuf.StringValue assessment = 5;
+		google.protobuf.StringValue typeAttestation = 6;
+
+		google.protobuf.StringValue date = 7;
+	}
+
+	google.protobuf.StringValue gradeBook = 1;
+	repeated StatementInfo statements = 2;
+}

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,8 +15,8 @@ namespace TransferLibrary.NetworkTransfer
 {
     public interface IHttpTransfer : System.IDisposable
     {
-        public TData SendRequest<TData>(Dictionary<System.String, System.Object> request_body, 
-            System.String resourse, System.Int32 timeout = 5000);
+        public TData SendRequest<TData>(Dictionary<System.String, System.Object> request_body,
+            Dictionary<System.String, System.String> headers, string resourse, int timeout = 5000);
         public string TestConnection(System.String connection, System.String message);
 
         public sealed class HttpTransferException : System.Exception
@@ -33,8 +34,8 @@ namespace TransferLibrary.NetworkTransfer
         public HttpTransfer(IHttpClientFactory client_factory, System.String hostname)
         { (this.ConnectionPath, this.ClientFactory) = (hostname, client_factory); }
 
-        public TData SendRequest<TData>(Dictionary<System.String, System.Object> request_body, 
-            string resourse, int timeout = 5000)
+        public TData SendRequest<TData>(Dictionary<System.String, System.Object> request_body,
+            Dictionary<System.String, System.String> headers, string resourse, int timeout = 5000)
         {
             using HttpClient httpClient = this.ClientFactory.CreateClient();
             httpClient.Timeout = TimeSpan.FromMilliseconds(timeout);
@@ -42,8 +43,9 @@ namespace TransferLibrary.NetworkTransfer
             var request = new HttpRequestMessage()
             {
                 Method = HttpMethod.Post, Content = JsonContent.Create(request_body),
-                RequestUri = new Uri($@"{this.ConnectionPath}/{resourse}"),
+                RequestUri = new Uri($@"{this.ConnectionPath}/{resourse}") 
             };
+            foreach (var item in headers) request.Headers.Add(item.Key, item.Value);
             using (HttpResponseMessage response = httpClient.SendAsync(request).Result)
             {
                 if (response.IsSuccessStatusCode != true)

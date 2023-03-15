@@ -1,7 +1,7 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this 
 #
 ARG RABBITMQ_HOST_ARG=host.docker.internal
-ARG 1CHTTP_HOST_ARG=http://host.docker.internal/Institute/hs/student_info
+ARG 1CHTTP_HOST_ARG=http://host.docker.internal:5272
 #
 # Build .NET Project with MSBuilder tools (сборка с использованием инструмента)
 FROM mcr.microsoft.com/dotnet/sdk AS build

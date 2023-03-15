@@ -28,11 +28,11 @@ namespace TransferLibrary.Export
         public RequestType(string state) : base() => this.RequestValue = state;
 
 
-        public readonly static RequestType Authorization = new("authorization");
+        public readonly static RequestType Authorization = new("GetProfileData");
 
-        public readonly static RequestType Orders = new("orders");
+        //public readonly static RequestType Orders = new("orders");
 
-        public readonly static RequestType Statements = new("statements");
+        public readonly static RequestType Statements = new("GetProfileStatement");
     }
 
     public static class ExportTransfer : System.Object

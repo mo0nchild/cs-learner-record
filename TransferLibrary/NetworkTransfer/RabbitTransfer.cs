@@ -43,10 +43,10 @@ namespace TransferLibrary.NetworkTransfer
 
         public RabbitTransfer(ILogger<RabbitTransfer> logger, System.String hostname) : this(logger)
         {
-            this.RabbitConnection = (new ConnectionFactory() { HostName = hostname }).CreateConnection();
+            //this.RabbitConnection = (new ConnectionFactory() { HostName = hostname }).CreateConnection();
 
-            this.Logger.LogInformation($"RabbitHostname: {ExportTransfer.RabbitHostname}");
-            this.Logger.LogInformation($"HttpHostname: {ExportTransfer.HttpHostname}");
+            //this.Logger.LogInformation($"RabbitHostname: {ExportTransfer.RabbitHostname}");
+            //this.Logger.LogInformation($"HttpHostname: {ExportTransfer.HttpHostname}");
         }
         protected RabbitTransfer(ILogger<RabbitTransfer> logger) : base() { this.Logger = logger; }
 

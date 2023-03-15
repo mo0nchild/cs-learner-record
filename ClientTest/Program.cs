@@ -19,7 +19,7 @@ namespace ClientTest
             var rabbit_client = service_provider.GetService<IRabbitTransfer>()!;
             using var cancel_sourse = new CancellationTokenSource();
             try {
-                var result = rabbit_client.SendMessage(RequestType.Statements, "000000001", cancel_sourse.Token);
+                var result = rabbit_client.SendMessage(RequestType.Authorization, "418318", cancel_sourse.Token);
 
                 //cancel_sourse.Cancel();
                 if (result.Result == null) { Console.WriteLine("\n\tCANCELED\n"); return; }

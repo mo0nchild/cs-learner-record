@@ -22,7 +22,7 @@ services:
     environment:
 
       RABBITMQ_HOST: host.docker.internal
-      1CHTTP_HOST: http://host.docker.internal/Institute/hs/student_info
+      1CHTTP_HOST: http://host.docker.internal:5272
       
       INPUT_PATH: InputQueue
       OUTPUT_PATH: OutputExchange
