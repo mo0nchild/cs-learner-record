@@ -3,6 +3,12 @@
 ##
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
+# Docker database Volumes
+
+# [Rr]abbitmq-database/
+# [Pp]gdata/
+# [Pp]gadmin/
+
 # User-specific files
 *.rsuser
 *.suo
@@ -361,3 +367,4 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/HttpProxyService/rabbitmq-database/.erlang.cookie
