@@ -4,7 +4,7 @@ ARG RABBITMQ_HOST_ARG=host.docker.internal
 ARG 1CHTTP_HOST_ARG=http://host.docker.internal/Institute/hs/student_info
 #
 # Build .NET Project with MSBuilder tools (сборка с использованием инструмента)
-FROM mcr.microsoft.com/dotnet/sdk AS build
+FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 #
 # Docker container Application Metadatas (Метаданные приложения)
 LABEL APPLICATION_NAME=LEARNER_RECORD

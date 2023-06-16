@@ -1,0 +1,137 @@
+# docker-compose tool version tag-name / default
+version: "3"
+
+# docker-compose service's collection name 
+name: rabbitmq_http_service
+
+# connection of application services / containers
+services:
+  
+  # docker service for data transfer to 1C HTTP service
+  httpproxyservice:
+
+    container_name: 'httpproxyservice'
+    
+    image: mo0nchild/http_proxy_service:latest
+
+    build: # build docker image (Dockerfile) for http-proxy-service
+      dockerfile: ./HttpProxyService/Dockerfile
+      context: .
+      
+
+    # application environment variable forwarding to proxy service
+    environment:
+
+      RABBITMQ_HOST: host.docker.internal
+      HTTP_HOST: 'http://host.docker.internal/Institute/hs'
+
+      DATABASE_CONNECTION: 'Host=database_logs;Port=5432;Username=root;Password=root;Database=1cdb_logs'
+      
+      STUDENT_INPUT_PATH: InputQueue
+      STUDENT_OUTPUT_PATH: OutputExchange
+
+      EMPLOYEE_INPUT_PATH: EmployeeInputQueue
+      EMPLOYEE_OUTPUT_PATH: EmployeeOutputExchange
+
+      HTTP_TIMEOUT: 3000
+      HANDLER_TIMER: 20000
+
+    # deploy settings for service / container entity
+    deploy:
+      update_config:
+        delay: 2s  
+
+      restart_policy: 
+        condition: on-failure
+
+      resources:
+        # service docker machine resourse limits
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+    ports: # proxy application port forwarding
+      - "3000:8000/tcp"
+
+    # service / container host network usage
+    # network_mode: host
+    restart: always
+
+    # service / container wait while rabbitmq_broker service start
+    depends_on: 
+      - rabbitmq_broker
+      - database_logs
+
+    networks:
+      - postgres
+
+  # docker service for RabbitMQ Broker Server
+  rabbitmq_broker:
+  
+    container_name: rabbitmq_service
+
+    # docker service for RabbitMQ Broker Server
+    image: kovshik/rabbirservice:latest
+    hostname: kovshik
+
+    restart: always
+    ports: # broker port forwarding
+      - "15672:15672/tcp"
+      - "5672:5672/tcp"
+
+    volumes: # docker volume for database RabbitMQ Server
+      - ./rabbitmq-database:/var/lib/rabbitmq
+
+  database_logs:
+    image: postgres:latest
+    container_name: 'databaselogs'
+    restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+    
+    environment:
+    
+      POSTGRES_USER: 'root'
+      POSTGRES_PASSWORD: 'root'
+      POSTGRES_DB: '1cdb_logs'
+      PGDATA: "/var/lib/postgresql/data/pgdata"
+
+    volumes:
+      - ./database-logs:/var/lib/postgresql/data
+    
+    ports:
+      - '5433:5432'
+    networks:
+      - postgres
+
+  pgadmin:
+    container_name: 'pgadmin_access'
+    image: dpage/pgadmin4:latest
+
+    restart: always
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    ports:
+      - '5050:80'
+    networks:
+      - postgres
+
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512G
+
+networks:
+  postgres:
+    driver: bridge      
+  
+
+
+          

@@ -24,6 +24,18 @@ namespace TransferLibrary.NetworkTransfer
         {
             [Newtonsoft.Json.JsonPropertyAttribute("Данные")]
             public List<Dictionary<string, object>> JsonRecord { get; set; } = new();
+
+            public override string ToString()
+            {
+                var resultString = "Данные запроса: [ ";
+                foreach(var item in this.JsonRecord)
+                {
+                    resultString += "{ ";
+                    foreach (var record in item) resultString += $"{{ \"{record.Key}\" : \"{record.Value}\" }}, ";
+                    resultString += " }, ";
+                }
+                return resultString + " ]";
+            }
         }
         public void SendMessage(MessageJson message, string exchange, string key = "");
         public System.Guid RabbitID { get; }
@@ -44,9 +56,7 @@ namespace TransferLibrary.NetworkTransfer
         public RabbitTransfer(ILogger<RabbitTransfer> logger, System.String hostname) : this(logger)
         {
             this.RabbitConnection = (new ConnectionFactory() { HostName = hostname }).CreateConnection();
-
-            this.Logger.LogInformation($"RabbitHostname: {ExportTransfer.RabbitHostname}");
-            this.Logger.LogInformation($"HttpHostname: {ExportTransfer.HttpHostname}");
+            this.Logger.LogInformation($"RabbitHostname: {hostname}");
         }
         protected RabbitTransfer(ILogger<RabbitTransfer> logger) : base() { this.Logger = logger; }
 

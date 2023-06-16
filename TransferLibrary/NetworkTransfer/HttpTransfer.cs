@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,8 +8,10 @@ using System.Net;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Net.Mime;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using TransferLibrary.Export;
 
 namespace TransferLibrary.NetworkTransfer
 {
@@ -27,12 +30,15 @@ namespace TransferLibrary.NetworkTransfer
 
     public class HttpTransfer : System.Object, NetworkTransfer.IHttpTransfer
     {
+        protected ILogger<HttpTransfer> Logger { get; private set; } = default!;
         protected IHttpClientFactory ClientFactory { get; private set; } = default!;
         protected System.String ConnectionPath { get; private set; } = default!;
 
-        public HttpTransfer(IHttpClientFactory client_factory, System.String hostname)
-        { (this.ConnectionPath, this.ClientFactory) = (hostname, client_factory); }
-
+        public HttpTransfer(ILogger<HttpTransfer> logger, IHttpClientFactory client_factory, System.String hostname)
+        { 
+            (this.ConnectionPath, this.ClientFactory) = (hostname, client_factory);
+            (this.Logger = logger).LogInformation($"HttpHostname: {this.ConnectionPath}");
+        }
         public TData SendRequest<TData>(Dictionary<System.String, System.Object> request_body, 
             string resourse, int timeout = 5000)
         {

@@ -12,6 +12,9 @@ using TransferLibrary.NetworkTransfer;
 using System.Threading;
 using Newtonsoft.Json.Linq;
 using System.Net;
+using System.Configuration.Internal;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging.Console;
 
 namespace TransferLibrary.Export
 {
@@ -22,25 +25,50 @@ namespace TransferLibrary.Export
         public TransferException(System.String message) : base(message) { }
     }
 
+    public sealed class TransferServiceProvider : object
+    {
+        public IRabbitTransfer RabbitTransfer { get; set; } = default!;
+        public IHttpTransfer HttpTransfer { get; set; } = default!;
+
+        public TransferServiceProvider() : base() { }
+    }
+
     public class RequestType : System.Object
     {
-        public System.String RequestValue { get; private set; } = default!;
-        public RequestType(string state) : base() => this.RequestValue = state;
+        public System.String RequestValue { get; protected set; } = default!;
 
+        public System.String InputPath { get; protected set; } = default!;
+        public System.String OutputPath { get; protected set; } = default!;
 
-        public readonly static RequestType Authorization = new("authorization");
+        public RequestType(string state, string input, string output) : base()
+        {
+            this.RequestValue = state; this.InputPath = input; this.OutputPath = output;
+        }
+    }
 
-        public readonly static RequestType Orders = new("orders");
+    public sealed class StudentRequestType : RequestType
+    {
+        public StudentRequestType(string request, string input, string output) : base(request, input, output) { }
 
-        public readonly static RequestType Statements = new("statements");
+        public readonly static StudentRequestType Profile = new("student_info/profile", "InputExchange", "OutputExchange");
+
+        public readonly static StudentRequestType Orders = new("student_info/orders", "InputExchange", "OutputExchange");
+
+        public readonly static StudentRequestType Statements = new("student_info/statements", "InputExchange", "OutputExchange");
+    }
+
+    public sealed class EmployeeRequestType : RequestType
+    {
+        public EmployeeRequestType(string request, string input, string output) : base(request, input, output) { }
+
+        public readonly static EmployeeRequestType Profile = new("employee_info/profile", "EmployeeInputExchange", "EmployeeOutputExchange");
+
+        public readonly static EmployeeRequestType Attestation = new("employee_info/attestation", "EmployeeInputExchange", "EmployeeOutputExchange");
     }
 
     public static class ExportTransfer : System.Object
     {
         private const System.String InputExchange = "InputExchange", OutputExchange = "OutputExchange";
-
-        public static System.String HttpHostname { get; set; } = "http://localhost:8080";
-        public static System.String RabbitHostname { get; set; } = "localhost";
 
         public static System.Guid ExportManagerId { get; private set; } = default;
         static ExportTransfer() { ExportTransfer.ExportManagerId = Guid.NewGuid(); }
@@ -50,19 +78,31 @@ namespace TransferLibrary.Export
             return services_collection.AddHttpClient()
                 .AddTransient<NetworkTransfer.IRabbitTransfer, NetworkTransfer.RabbitTransfer>((dispatcher) =>
                 {
+                    var configuration = dispatcher.GetRequiredService<IConfiguration>();
+
                     var required_logger = dispatcher.GetRequiredService<ILoggerFactory>()
                         .CreateLogger<NetworkTransfer.RabbitTransfer>();
-                    return new NetworkTransfer.RabbitTransfer(required_logger, ExportTransfer.RabbitHostname);
+                    return new NetworkTransfer.RabbitTransfer(required_logger, configuration["RABBITMQ_HOST"]!);
                 })
                 .AddTransient<NetworkTransfer.IHttpTransfer, NetworkTransfer.HttpTransfer>((dispatcher) =>
                 {
                     var required_service = dispatcher.GetRequiredService<IHttpClientFactory>();
-                    return new NetworkTransfer.HttpTransfer(required_service, ExportTransfer.HttpHostname);
+                    var configuration = dispatcher.GetRequiredService<IConfiguration>();
+                    var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole()).CreateLogger<HttpTransfer>();
+
+                    return new NetworkTransfer.HttpTransfer(loggerFactory, required_service, configuration["HTTP_HOST"]!);
+                })
+                .AddTransient<TransferServiceProvider>(dispatcher => 
+                {
+                    return new TransferServiceProvider()
+                    {
+                        RabbitTransfer = dispatcher.GetRequiredService<IRabbitTransfer>(),
+                        HttpTransfer = dispatcher.GetRequiredService<IHttpTransfer>(),
+                    };
                 });
         }
-        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer,
-            Dictionary<string, object> message, CancellationToken token, string input_exchange = InputExchange,
-            string output_exchange = OutputExchange)
+        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer, Dictionary<string, object> message, 
+            CancellationToken token, string input_exchange, string output_exchange)
         {
             if (message == null || message.ContainsKey("request_type") == false)
             { throw new Export.TransferException("ERROR: INPUT MESSAGE SET NOT CORRECTLY"); }
@@ -90,12 +130,39 @@ namespace TransferLibrary.Export
                 return request_result;
             });
         }
-        public static Task<MessageJson?> SendMessage(this IRabbitTransfer rabbit_transfer, RequestType type,
-            string person_id, CancellationToken token, string input_exchange = InputExchange,
-            string output_exchange = OutputExchange)
+        public static Task<MessageJson?> GetStudent(this IRabbitTransfer rabbit_transfer, StudentRequestType type,
+            string person_id, CancellationToken token)
         {
             return rabbit_transfer.SendMessage(new () { { "request_type", type.RequestValue }, { "Код", person_id } }, 
-                token, input_exchange, output_exchange);
+                token, type.InputPath, type.OutputPath);
+        }
+
+        public static Task<MessageJson?> GetEmployee(this IRabbitTransfer rabbit_transfer, EmployeeRequestType type,
+            string person_id, CancellationToken token)
+        {
+            return rabbit_transfer.SendMessage(new() { { "request_type", type.RequestValue }, { "Код", person_id } },
+                token, type.InputPath, type.OutputPath);
+        }
+
+        public sealed class MarkType : Object
+        {
+            public string MarkValue { get; private set; } = default!;
+            public MarkType(string markValue) : base() { this.MarkValue = markValue; }
+
+            public static MarkType NotBad { get; set; } = new("Удовлетворительно");
+            public static MarkType Good { get; set; } = new("Хорошо");
+            public static MarkType Perfect { get; set; } = new("Отлично");
+        }
+
+        public sealed record class MarkData(MarkType Type, string StatementNumber, string GradeBook);
+        public static Task<MessageJson?> SetMark(this IRabbitTransfer rabbitTransfer, MarkData markData, CancellationToken token)
+        {
+            return rabbitTransfer.SendMessage(new() 
+            { 
+                { "request_type", "employee_info/setmark" }, { "НомерВедомости", markData.StatementNumber },
+                { "ЗачетнаяКнига", markData.GradeBook }, { "Оценка", markData.Type.MarkValue }
+            }, 
+            token, "EmployeeInputExchange", "EmployeeOutputExchange");
         }
     }
 }

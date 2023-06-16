@@ -14,12 +14,14 @@ namespace ClientTest
                 .ConfigureServices((IServiceCollection service_collection) =>
                 {
                     service_collection.AddLogging().AddHttpClient().AddNetworkTransfer();
-                }).Build().Services;
+                })
+                .Build().Services;
 
             var rabbit_client = service_provider.GetService<IRabbitTransfer>()!;
             using var cancel_sourse = new CancellationTokenSource();
             try {
-                var result = rabbit_client.SendMessage(RequestType.Statements, "000000001", cancel_sourse.Token);
+                // var result = rabbit_client.GetEmployee(EmployeeRequestType.Attestation, "0000000001", cancel_sourse.Token);
+                var result = rabbit_client.SetMark(new ExportTransfer.MarkData(ExportTransfer.MarkType.Perfect, "1", "100234"), cancel_sourse.Token);
 
                 //cancel_sourse.Cancel();
                 if (result.Result == null) { Console.WriteLine("\n\tCANCELED\n"); return; }

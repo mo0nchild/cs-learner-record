@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using HttpProxyService;
 using HttpProxyService.ProxyService;
+using Microsoft.EntityFrameworkCore;
 using TransferLibrary.Export;
 
 internal sealed class Program : System.Object
@@ -8,14 +10,20 @@ internal sealed class Program : System.Object
     public static void Main(string[] args) => Program.ConfigureHost().Run();
     public static IHost ConfigureHost()
     {
-        ExportTransfer.RabbitHostname = Environment.GetEnvironmentVariable("RABBITMQ_HOST")!;
-        ExportTransfer.HttpHostname = Environment.GetEnvironmentVariable("1CHTTP_HOST")!;
-
         IHostBuilder host_builder = Host.CreateDefaultBuilder()
+            .ConfigureAppConfiguration(builder => builder.AddEnvironmentVariables())
             .ConfigureServices((IServiceCollection services_collection) =>
-           {
-               services_collection.AddNetworkTransfer().AddHostedService<HttpProxy>();
-           });
+            {
+                var configurationService = services_collection.BuildServiceProvider()
+                    .GetRequiredService<IConfiguration>();
+
+                services_collection.AddNetworkTransfer().AddDbContextFactory<DatabaseContext>(builder =>
+                {
+                    builder.UseNpgsql(configurationService["DATABASE_CONNECTION"]!);
+                })
+                    .AddHttpProxy("STUDENT_INPUT_PATH", "STUDENT_OUTPUT_PATH")
+                    .AddHttpProxy("EMPLOYEE_INPUT_PATH", "EMPLOYEE_OUTPUT_PATH");
+            });
         return host_builder.Build();
     }
 }
