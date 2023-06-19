@@ -1,32 +1,71 @@
-using Blazored.SessionStorage;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Web;
+﻿using ClientWeb.Models;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.Build.Execution;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
+using System.Security.Claims;
+using TransferLibrary.Export;
 
-var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-builder.Services.AddRazorPages();
-builder.Services.AddServerSideBlazor();
-builder.Services.AddBlazoredSessionStorage();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+namespace ClientWeb
 {
-    app.UseExceptionHandler("/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
+
+            // Add services to the container.
+            builder.Services.AddHttpClient().AddNetworkTransfer();
+
+            builder.Services.AddRazorPages();
+            builder.Services.AddControllersWithViews();
+
+            builder.Configuration.AddEnvironmentVariables();
+
+            builder.Services.AddDbContext<UsersContext>(options =>
+            {
+                options.UseNpgsql(builder.Configuration["DATABASE_USERS"]);
+            });
+
+            builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+                .AddCookie(options =>
+                {
+                    options.LoginPath = "/Account/login"; options.AccessDeniedPath = "/Account/login";
+                });
+
+            builder.Services.AddAuthorization(opts =>
+            {
+                opts.AddPolicy("OnlyForAdmin", policy => policy.RequireClaim(ClaimTypes.Role, "Администратор"));
+
+                opts.AddPolicy("OnlyForTeacher", policy => policy.RequireClaim(ClaimTypes.Role, "Преподователь"));
+                opts.AddPolicy("OnlyForStudent", policy => policy.RequireClaim(ClaimTypes.Role, "Студент"));
+            });
+
+            var app = builder.Build();
+
+            app.UseHttpsRedirection();
+            app.UseStaticFiles();
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/img")), 
+                RequestPath = new PathString(""),
+            });
+            app.UseStaticFiles(new StaticFileOptions()
+            {
+                FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), @"wwwroot/css")),
+                RequestPath = new PathString(""),
+            });
+
+            app.UseRouting();
+            app.UseAuthentication();
+            app.UseAuthorization();
+            app.MapRazorPages();
+
+            app.MapControllerRoute( name: "default", pattern: "{controller=Account}/{action=Login}/{id?}");
+
+            app.MapControllerRoute(name: "teacher", pattern: "/teacher", defaults: new { controller = "Home", action = "Teacher" });
+
+            app.Run();
+        }
+    }
 }
-
-app.UseHttpsRedirection();
-
-app.UseStaticFiles();
-
-app.UseRouting();
-
-app.MapRazorPages();
-app.MapBlazorHub();
-app.MapFallbackToPage("/_Host");
-
-app.Run();

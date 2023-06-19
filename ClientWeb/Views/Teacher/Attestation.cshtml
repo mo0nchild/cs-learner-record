@@ -1,0 +1,213 @@
+﻿@using ClientWeb.Helpers;
+@using ClientWeb.Models.TeacherModels
+@using ClientWeb.ViewModels.SubjectViewModel
+
+@inject IConfiguration configuration
+@model List<TeacherAttestationModel>
+@{
+    ViewData["Title"] = "Аттестация";
+
+    var currentIndex = this.ViewData["StatementIndex"] as int?;
+    var currentStatement = this.ViewData["StatementNumber"] as string;
+
+    var secureKey = configuration["SECURE_KEY"] ?? HashHelper.DefaultKey;
+    if (currentStatement == null && currentIndex != null)
+    {
+        currentStatement = HashHelper.Shifrovka(this.Model[currentIndex.Value].NumberAttestation, secureKey);
+    }
+    this.ViewBag.Title = "Аттестация";
+
+    var subjects = Model.DistinctBy(x => x.Subject).Select(x => x.Subject).ToList();
+    var subjectsViewModel = new List<SubjectViewModel>();
+    foreach(var subject in subjects)
+    {
+        subjectsViewModel.Add(new SubjectViewModel() {
+            SubjectName = subject,
+            Attestations = Model.Where(x => x.Subject == subject).Select(x => new Attestation {
+                //Group = x.StudentList.Count > 0 ? x.StudentList.First().Group : "Нет группы",
+                Group = x.Group,
+                NumberAttestation = x.NumberAttestation
+            }).ToList()
+        });
+    }
+}
+@section Header {
+    <div class="header_section">
+        <div class="header_logo">
+            <img src="~/img/vstu-logo.svg" alt="Логотип ВГТУ">
+        </div>
+        <div class="header_title">
+            <div class="header_divider"> </div>
+            <div class="header_portal_title">
+                <p>ОБРАЗОВАТЕЛЬНЫЙ ПОРТАЛ ВОРОНЕЖСКОГО ГОСУДАРСТВЕННОГО ТЕХНИЧЕСКОГО УНИВЕРСИТЕТА</p>
+            </div>
+        </div>
+    </div>
+    <div class="header_section">
+        <div class="header_account">
+            <a class="navbar-account" asp-area="" asp-controller="Home" asp-action="Student">
+                <img src="~/img/account.svg" alt="">
+            </a>
+        </div>
+    </div>
+}
+@section nav {
+    <nav>
+        <div class="navbar_section">
+            <div class="navbar_buttons">
+                <a asp-action="Attestation" asp-controller="Teacher">Аттестация</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Profile" asp-controller="Teacher">Профиль</a>
+            </div>
+            <div class="navbar_buttons">
+                <a href="#">Помощь</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Настройки</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+            </div>
+        </div>
+    </nav>
+}
+<div class="container h-100 w-100">
+<div class="row m-0">
+    <div class="col-4">
+         <div class="p-3 h-100 align-self-stretch" style="background-color: #263145; border-radius: 10px;">
+            <div class="row justify-content-center m-0 mb-3">
+                <a class="btn text-white" style="background-color: #3B4762;" >Навигация</a>
+            </div>
+            <div class="row justify-content-center m-0 mb-3">
+                <a asp-action="Profile" asp-controller="Teacher" class="btn text-white" style="background-color: #3B4762;">На главную страницу</a>
+            </div>
+            <div class="navigation_divider"></div>
+            <div style="overflow: auto; max-height: 300px;">
+            @for (int i = 0; i < subjectsViewModel.Count; i++)
+            {
+                var currentRecord = subjectsViewModel[i];
+                <div class="row justify-content-center m-0 mb-1">
+                    <a class="btn text-white" style="background-color: #3B4762;" data-bs-toggle="collapse" href="@($"#multiCollapseExample{@i}")">
+                        @currentRecord.SubjectName
+                    </a>
+                </div>
+                @for (var index = 0; index < currentRecord.Attestations.Count; index++)
+                {
+                var attestation = currentRecord.Attestations[index];
+
+                <div class="row justify-content-center m-0 @((index + 1 == currentRecord.Attestations.Count) ? "mb-2" : "mb-1")">
+                    <div class="collapse multi-collapse p-0" id="@($"multiCollapseExample{i}")">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;" asp-action="Attestation"
+                                       asp-route-statementNumber="@HashHelper.Shifrovka(attestation.NumberAttestation, secureKey)">
+                            @attestation.NumberAttestation (@attestation.Group)
+                        </a>
+                    </div>
+                </div>
+                }
+            }
+            </div>
+        </div>
+    </div>
+    <div class="col-8" style="border-radius: 10px;">
+        <div class="p-4" style="background-color: #263145; border-radius: 10px;">
+            <div class="row w-100 fs-4 mb-4 text-white"> <p>Информация о ведомости:</p></div>
+
+            @this.Html.ValidationSummary("", new { @class="w-100 mb-4 text-danger", style="font-size:16px;" });
+            @if(currentIndex == null || this.Model.Count <= 0)
+            {   
+            <div class="w-100 fs-3 text-white text-center" style="border-radius: 10px; background-color: #263145;">
+                <p> У вас пока нет ведомостей </p>
+            </div>
+            }
+            else
+            {
+            var currentModel = this.Model[currentIndex.Value];
+            <div class="row gx-4 mb-3 text-white">
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.Subject" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Дисциплина</label>
+                </div>
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.SemesterNumber" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Период контроля</label>
+                </div>
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.TypeControl" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Вид контроля</label>
+                </div>
+            </div>
+            <div class="row gx-4 mb-3 text-white">
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.TypeAttestation" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Система оценивания</label>
+                </div>
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.Group" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Номер группы</label>
+                </div>
+                <div class="col-4">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.NumberAttestation" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Номер Ведомости</label>
+                </div>
+            </div>
+            <div class="row gx-4 mb-3 text-white">
+                <div class="col-6">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.ClassDate" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Дата занятия</label>
+                </div>
+                <div class="col-6 ">
+                    <input class="form-control border-0 text-white" style="background-color: #3B4762;" type="text" readonly value="@currentModel.StartDate" />
+                    <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Время начала</label>
+                </div>
+            </div>
+            <div class="row w-100 fs-4 mb-4 text-white"> <p>Статистика студентов:</p></div>
+            <form asp-asp-controller="Teacher" asp-action="SaveMarks" method="post" class="row mb-4">
+                <div class="mb-3 custom-overflow">
+                    <table class="table text-white" style="table-layout:fixed;">
+                        <col width="200" />
+                        <col width="80" />
+                        <col width="200" />
+                        <col width="80" />
+                        <col width="200" />
+                    <thead style="color: #D1AF69; font-size:14px;">                  
+                        <tr>                                        
+                            <th width="300"  scope="col">ФИО Студента</th>
+                            <th width="80" scope="col">Группа</th>
+                            <th width="200" scope="col">Номер зачётной книги</th>
+                            <th width="80" scope="col">Факультет</th>
+                            <th width="200" scrope="coll">Отметка</th>
+                        </tr>
+                    </thead>
+                    <tbody style="border-color:#D1AF69; font-size:14px;">
+                    @for (int index = 0; index < this.Model[currentIndex.Value].StudentList.Count;index++)
+                    {
+                        var record = this.Model[currentIndex.Value].StudentList[index];
+                        <tr>
+                            <th scope="row">@($"{record.Surname} {record.Name} {record.Partonymic}")</th>
+                            <td>@record.Group</td>
+                            <td>@record.Gradebook</td>
+                            <td>@record.Faculty</td>
+                            <td>
+                                <select class="form-select form-select-sm text-white" style="background-color: #3B4762;" 
+                                    name="@($"MarksList[{index}].MarkValue")">
+
+                                @foreach (var item in (this.ViewData["MarksList"] as List<string>)!)
+                                {
+                                    if (item == record.Mark) { <option value="@(item)" class="text-white" selected>@(item)</option> }
+                                    else { <option value="@(item)" class="text-white">@(item)</option> }
+                                }
+                                </select>
+                            </td>
+                        </tr>
+                        @Html.Hidden($"MarksList[{index}].Gradebook", record.Gradebook);
+                    }
+                    </tbody>
+                </table>
+                </div>
+                        @Html.Hidden($"StatementNumber", currentStatement)
+                <input class="btn-primary w-100 fs-5 p-2" type="submit" value="Сохранить ведомость"
+                    style="background-color: #3B4762; color: #D1AF69; border-color: #D1AF69; border-radius: 10px;" />
+            </form>
+            }
+        </div>
+    </div>
+</div>
+</div>

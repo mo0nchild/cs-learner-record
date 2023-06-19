@@ -143,26 +143,21 @@ namespace TransferLibrary.Export
             return rabbit_transfer.SendMessage(new() { { "request_type", type.RequestValue }, { "Код", person_id } },
                 token, type.InputPath, type.OutputPath);
         }
-
-        public sealed class MarkType : Object
-        {
-            public string MarkValue { get; private set; } = default!;
-            public MarkType(string markValue) : base() { this.MarkValue = markValue; }
-
-            public static MarkType NotBad { get; set; } = new("Удовлетворительно");
-            public static MarkType Good { get; set; } = new("Хорошо");
-            public static MarkType Perfect { get; set; } = new("Отлично");
-        }
-
-        public sealed record class MarkData(MarkType Type, string StatementNumber, string GradeBook);
+        public sealed record class MarkData(string Mark, string StatementNumber, string GradeBook);
         public static Task<MessageJson?> SetMark(this IRabbitTransfer rabbitTransfer, MarkData markData, CancellationToken token)
         {
             return rabbitTransfer.SendMessage(new() 
             { 
                 { "request_type", "employee_info/setmark" }, { "НомерВедомости", markData.StatementNumber },
-                { "ЗачетнаяКнига", markData.GradeBook }, { "Оценка", markData.Type.MarkValue }
+                { "ЗачетнаяКнига", markData.GradeBook }, { "Оценка", markData.Mark }
             }, 
             token, "EmployeeInputExchange", "EmployeeOutputExchange");
+        }
+
+        public static Task<MessageJson?> MarksList(this IRabbitTransfer rabbitTransfer, CancellationToken token)
+        {
+            var requestData = new Dictionary<string, object>() { { "request_type", "employee_info/markslist" } };
+            return rabbitTransfer.SendMessage(requestData, token, "EmployeeInputExchange", "EmployeeOutputExchange");
         }
     }
 }

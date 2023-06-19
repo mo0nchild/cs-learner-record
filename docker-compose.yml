@@ -6,7 +6,35 @@ name: rabbitmq_http_service
 
 # connection of application services / containers
 services:
-  
+
+  aspnetwebclient:
+    container_name: 'webclient'
+
+    image: aspnetwebclient
+
+    build:
+      dockerfile: ./ClientWeb/Dockerfile
+      context: .
+
+    environment:
+      RABBITMQ_HOST: rabbitmq_broker
+      DATABASE_USERS: 'Host=database_logs;Port=5432;Database=auth_users;Username=root;Password=root'
+      SECURE_KEY: 'Fantokin'
+
+    networks:
+      - postgres
+
+    depends_on:
+      - database_logs
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
+
+    ports:
+      - '8080:80'
+
   # docker service for data transfer to 1C HTTP service
   httpproxyservice:
 
@@ -17,7 +45,6 @@ services:
     build: # build docker image (Dockerfile) for http-proxy-service
       dockerfile: ./HttpProxyService/Dockerfile
       context: .
-      
 
     # application environment variable forwarding to proxy service
     environment:
@@ -38,12 +65,12 @@ services:
 
     # deploy settings for service / container entity
     deploy:
-      update_config:
-        delay: 2s  
 
       restart_policy: 
-        condition: on-failure
-
+        condition: any # on-failure
+        #max_attempts: 10
+        delay: 2s
+        
       resources:
         # service docker machine resourse limits
         limits:
@@ -55,7 +82,7 @@ services:
 
     # service / container host network usage
     # network_mode: host
-    restart: always
+    restart: on-failure:5
 
     # service / container wait while rabbitmq_broker service start
     depends_on: 
@@ -73,6 +100,9 @@ services:
     # docker service for RabbitMQ Broker Server
     image: kovshik/rabbirservice:latest
     hostname: kovshik
+
+    networks:
+      - postgres
 
     restart: always
     ports: # broker port forwarding
@@ -122,6 +152,9 @@ services:
     networks:
       - postgres
 
+    volumes:
+      - './pgadmin:/var/lib/pgadmin'
+
     deploy:
       resources:
         limits:
@@ -130,8 +163,4 @@ services:
 
 networks:
   postgres:
-    driver: bridge      
-  
-
-
-          
+    driver: bridge

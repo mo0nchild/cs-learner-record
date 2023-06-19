@@ -28,6 +28,7 @@ namespace HttpProxyService
                 new MethodInfo() { MethodInfoId = 4, Name = "EmployeeProfile", RequestPath = "employee_info/profile" },
                 new MethodInfo() { MethodInfoId = 5, Name = "EmployeeAttestation", RequestPath = "employee_info/attestation" },
                 new MethodInfo() { MethodInfoId = 6, Name = "EmployeeSetMark", RequestPath = "employee_info/setmark" },
+                new MethodInfo() { MethodInfoId = 7, Name = "EmployeeMarksList", RequestPath = "employee_info/markslist" },
             });
         }
     }

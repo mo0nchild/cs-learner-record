@@ -1,0 +1,54 @@
+﻿@model ClientWeb.Models.User
+
+@{
+    ViewData["Title"] = "Создание пользователя";
+}
+
+@section Header {
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="~/vstu-logo.svg" width="52" height="72">
+        </a>
+        <a class="navbar-account" asp-controller="Home" asp-action="Admin">
+            Личный кабинет
+        </a>
+        <a class="navbar-account" asp-controller="Users" asp-action="Index">
+            Все пользователи
+        </a>
+    </nav>
+}
+
+<h2>Создание пользоваетеля</h2>
+
+<h4>Пользователь</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Login" class="control-label">Логин</label>
+                <input asp-for="Login" class="form-control" />
+                <span asp-validation-for="Login" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Password" class="control-label">Пароль</label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Role" class="control-label">Роль</label>
+                <input asp-for="Role" class="form-control" />
+                <span asp-validation-for="Role" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Вернуться к списку пользователей</a>
+</div>
+

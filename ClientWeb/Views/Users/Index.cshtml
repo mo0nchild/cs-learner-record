@@ -1,0 +1,62 @@
+﻿@model IEnumerable<ClientWeb.Models.User>
+
+@{
+    ViewData["Title"] = "База данных пользователей";
+}
+
+@section Header {
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="~/vstu-logo.svg" width="52" height="72">
+        </a>
+        <a class="navbar-account" asp-controller="Home" asp-action="Admin">
+            Личный кабинет
+        </a>
+        <a class="navbar-account" asp-controller="Users" asp-action="Index">
+            Все пользователи
+        </a>
+    </nav>
+}
+
+<h2>База данных пользователей</h2>
+
+<p>
+    <a asp-action="Create">Добавить нового пользователя</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Login)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Password)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Role)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Login)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Password)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Role)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.IdUser">Изменить</a> |
+                    <a asp-action="Details" asp-route-id="@item.IdUser">Подробнее</a> |
+                    <a asp-action="Delete" asp-route-id="@item.IdUser">Удалить</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

@@ -1,0 +1,108 @@
+﻿@using ClientWeb.Models.TeacherModels
+@model TeacherProfileModel
+@{
+    ViewData["Title"] = "Преподаватель";
+}
+@section Header {
+    <div class="header_section">
+        <div class="header_logo">
+            <img src="~/vstu-logo.svg" alt="">
+        </div>
+        <div class="header_title">
+            <div class="header_divider"> </div>
+            <div class="header_portal_title">
+                <p>ОБРАЗОВАТЕЛЬНЫЙ ПОРТАЛ ВОРОНЕЖСКОГО ГОСУДАРСТВЕННОГО ТЕХНИЧЕСКОГО УНИВЕРСИТЕТА</p>
+            </div>
+        </div>
+    </div>
+    <div class="header_section">
+        <div class="header_account">
+            <img src="~/account.svg" alt="">
+        </div>
+    </div>
+}
+
+@section nav {
+    <nav>
+        <div class="navbar_section">
+            <div class="navbar_buttons">
+                <a asp-action="Attestation" asp-controller="Teacher">Аттестация</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Profile" asp-controller="Teacher">Профиль</a>
+            </div>
+            <div class="navbar_buttons">
+                <a href="#">Помощь</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Настройки</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+            </div>
+        </div>
+    </nav>  
+}
+<div class="container h-100 w-100">
+    <div class="row m-0">
+        <div class="col-4">
+            <div class="p-3 h-100 align-self-stretch" style="background-color: #263145; border-radius: 10px;">
+                <div class="row justify-content-center m-0 mb-3">
+                    <a class="btn text-white" style="background-color: #3B4762;">Навигация</a>
+                </div>
+                <div class="navigation_divider"></div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Profile" asp-controller="Teacher" class="btn text-white" style="background-color: #3B4762;">На главную страницу</a>
+                </div>
+            </div>
+        </div>
+        <div class="col-8" style="border-radius: 10px;">
+            <div class="p-4" style="background-color: #263145; border-radius: 10px;">
+                <div class="row fs-4 mb-4 text-white"><p>Информация о преподавателе:</p></div>
+                <div class="row gx-0 fs-4 mb-4 text-white">
+                    <div class="col-2 p-2 d-flex justify-content-center" style="background-color: #3B4762; border-radius: 10px 0 0 10px; ">
+                        <img src="~/img/account.svg" alt=""> 
+                    </div>
+                    <div class="col-10 d-flex align-items-center" style="background-color: #3B4762; border-radius: 0 10px 10px 0;">
+                        <p>@Model.LastName @Model.FirstName @Model.Patronomic</p>
+                    </div>  
+                </div>
+                <div class="row gx-4 mb-3 text-white">
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Sex" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Пол</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Birthday" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Дата рождения</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.TeacherId" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Табельный номер</label>
+                    </div>
+                </div>
+                <div class="row gx-4 mb-3 text-white">
+                    <div class="col-6">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Department" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Кафедра</label>
+                    </div>
+                    <div class="col-6">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Devision" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Подразделение</label>
+                    </div>
+                </div>
+                <div class="row gx-4 mb-3 text-white">
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Post" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Должность</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.Bet" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Ставка</label>
+                    </div>
+                    <div class="col-4">
+                        <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model.TypeOfAccrual" />
+                        <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Вид начисления</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

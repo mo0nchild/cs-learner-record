@@ -1,0 +1,50 @@
+﻿@model ClientWeb.Models.User
+
+@{
+    ViewData["Title"] = "Детали пользователя";
+}
+
+@section Header {
+    <nav class="navbar">
+        <a class="navbar-brand" href="#">
+            <img src="~/vstu-logo.svg" width="52" height="72">
+        </a>
+        <a class="navbar-account" asp-controller="Home" asp-action="Admin">
+            Личный кабинет
+        </a>
+        <a class="navbar-account" asp-controller="Users" asp-action="Index">
+            Все пользователи
+        </a>
+    </nav>
+}
+
+<h2>Детали</h2>
+
+<div>
+    <h4>User</h4>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Login)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Login)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Password)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Password)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Role)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Role)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.IdUser">Изменить</a> |
+    <a asp-action="Index">Вернуться к списку пользователей</a>
+</div>

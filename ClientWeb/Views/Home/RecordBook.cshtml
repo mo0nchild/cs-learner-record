@@ -1,0 +1,200 @@
+﻿@model System.Collections.Generic.List<ClientWeb.Models.RecordBookJSON>
+
+@{
+    ViewData["Title"] = "Зачетная книжка";
+}
+
+@section Header {
+    <div class="header_section">
+        <div class="header_logo">
+            <img src="~/img/vstu-logo.svg" alt="Логотип ВГТУ">
+        </div>
+        <div class="header_title">
+            <div class="header_divider"> </div>
+            <div class="header_portal_title">
+                <p>ОБРАЗОВАТЕЛЬНЫЙ ПОРТАЛ ВОРОНЕЖСКОГО ГОСУДАРСТВЕННОГО ТЕХНИЧЕСКОГО УНИВЕРСИТЕТА</p>
+            </div>
+        </div>
+    </div>
+    <div class="header_section">
+        <div class="header_account">
+            <a class="navbar-account" asp-area="" asp-controller="Home" asp-action="Student">
+                <img src="~/img/account.svg" alt="">
+            </a>
+        </div>
+    </div>
+}
+
+@section nav {
+    <nav>
+        <div class="navbar_section">
+            <div class="navbar_buttons">
+                <a href="#">Расписание</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="RecordBook" asp-controller="Home">Зачетная книжка</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Учебные планы</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Моя группа</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Расписание</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Student" asp-controller="Home">Профиль</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Orders" asp-controller="Home">Приказы</a>
+            </div>
+            <div class="navbar_buttons">
+                <a href="#">Помощь</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Настройки</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+            </div>
+        </div>
+    </nav>
+}
+
+<div class="container h-100 w-100">
+    <div class="row m-0">
+        <div class="col-4">
+            <div class="p-3 h-100 align-self-stretch" style="background-color: #263145; border-radius: 10px;">
+                <div class="row justify-content-center m-0 mb-3">
+                    <a class="btn text-white" style="background-color: #3B4762;">Навигация</a>
+                </div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Student" asp-controller="Home" class="btn text-white" style="background-color: #3B4762;">На главную страницу</a>
+                </div>
+                <div class="navigation_divider"></div>
+
+                <div class="row justify-content-center m-0 mb-1">
+                    <a class="btn text-white" style="background-color: #3B4762;" data-bs-toggle="collapse" href="#multiCollapseExample1">Курс</a>
+                </div>
+                <div class="row justify-content-center m-0">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">1 курс (1 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">1 курс (2 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">2 курс (3 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0 ">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">2 курс (4 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0 ">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">3 курс (5 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0 ">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">3 курс (6 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0 ">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">4 курс (7 семестр)</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <div class="collapse multi-collapse p-0" id="multiCollapseExample1">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">4 курс (8 семестр)</a>
+                    </div>
+                </div>
+
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Student" asp-controller="Home" class="btn text-white" style="background-color: #3B4762;">Экзамены</a>
+                </div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Student" asp-controller="Home" class="btn text-white" style="background-color: #3B4762;">Зачеты</a>
+                </div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Student" asp-controller="Home" class="btn text-white" style="background-color: #3B4762;">Курсовая работа/проект</a>
+                </div>
+
+                <div class="row justify-content-center m-0 mb-1">
+                    <a class="btn text-white" style="background-color: #3B4762;" data-bs-toggle="collapse" href="#multiCollapseExample2">Практика</a>
+                </div>
+                <div class="row justify-content-center m-0">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample2">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">Учебная практика</a>
+                    </div>
+                </div>
+                <div class="row justify-content-center m-0">
+                    <div class="collapse multi-collapse p-0 mb-1" id="multiCollapseExample2">
+                        <a class="btn text-white w-100" style="background-color: #3B4762;">Производственная практика</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-8" style="border-radius: 10px;">
+            <div class="p-4 h-100 align-self-stretch" style="background-color: #263145; border-radius: 10px;">
+                <div class="row fs-4 mb-4 text-white">
+                    <p>Информация о зачетной книге:</p>
+                </div>
+                @if(this.Model.Count <= 0) { <div class="row fs-3 mb-4 text-white text-center"> <p>У вас пока нет дисциплин</p> </div> }
+                else
+                {
+                <div class="mb-3 custom-overflow">
+                <table class="table text-white" style="table-layout:fixed;">
+                        <col width="200" />
+                        <col width="200" />
+                        <col width="100" />
+                        <col width="250" />
+                    <thead style="color: #D1AF69; font-size:16px;">                  
+                        <tr>                              
+                            <th scope="col">Наименование дисциплины</th>
+                            <th scope="col">Отметка</th>
+                            <th scope="col">Дата</th>
+                            <th scope="col">ФИО преподавателя/экзаменатора</th>
+                        </tr>
+                    </thead>
+                    <tbody style="border-color:#D1AF69; font-size:16px;">
+                        @foreach (var record in @Model)
+                        {
+                        <tr>
+                            <th scope="row">@record.Discipline</th>
+                            <td>@record.Grade</td>
+                            <td>@record.Date.Value.Date.ToString("d")</td>
+                            <td>@record.Teacher</td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+                </div>
+                @*<div class="mb-3 custom-overflow">
+                    <table class="table text-white" >
+                        <thead style="color: #D1AF69; font-size:14px;">                  
+                            <tr>                                        
+                                <th scope="col">Наименование дисциплины</th>
+                                <th scope="col">Отметка</th>
+                                <th scope="col">Дата</th>
+                                <th scope="col">ФИО преподавателя/экзаменатора</th>
+                            </tr>
+                        </thead>
+                        <tbody style="border-color:#D1AF69; font-size:14px;">
+                            @foreach (var record in @Model)
+                            {
+                            <tr>
+                                <th scope="row">@record.Discipline</th>
+                                <td>@record.Grade</td>
+                                <td>@record.Date.Value.Date.ToString("d")</td>
+                                <td>@record.Teacher</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>*@
+                }
+            </div>
+        </div>
+    </div>
+</div>

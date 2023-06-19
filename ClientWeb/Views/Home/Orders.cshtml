@@ -1,0 +1,131 @@
+﻿@using ClientWeb.Helpers;
+@using ClientWeb.Models
+@inject IConfiguration configuration
+@model List<OrdersJSON>
+@{
+    var currentIndex = this.ViewData["OrderIndex"] as int?;
+    ViewData["Title"] = "Приказы";
+    var secureKey = configuration["SECURE_KEY"] ?? HashHelper.DefaultKey;
+}
+@section Header {
+    <div class="header_section">
+        <div class="header_logo">
+            <img src="~/img/vstu-logo.svg" alt="">
+        </div>
+        <div class="header_title">
+            <div class="header_divider"> </div>
+            <div class="header_portal_title">
+                <p>ОБРАЗОВАТЕЛЬНЫЙ ПОРТАЛ ВОРОНЕЖСКОГО ГОСУДАРСТВЕННОГО ТЕХНИЧЕСКОГО УНИВЕРСИТЕТА</p>
+            </div>
+        </div>
+    </div>
+    <div class="header_section">
+        <div class="header_account">
+            <a class="navbar-account" asp-area="" asp-controller="Home" asp-action="Student">
+                <img src="~/img/account.svg" alt="">
+            </a>
+        </div>
+    </div>
+}
+
+@section nav {
+    <nav>
+        <div class="navbar_section">
+            <div class="navbar_buttons">
+                <a href="#">Расписание</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="RecordBook" asp-controller="Home">Зачетная книжка</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Учебные планы</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Моя группа</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Расписание</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Student" asp-controller="Home">Профиль</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Orders" asp-controller="Home">Приказы</a>
+            </div>
+            <div class="navbar_buttons">
+                <a href="#">Помощь</a>
+                <div class="navbar_button_divider"></div>
+                <a href="#">Настройки</a>
+                <div class="navbar_button_divider"></div>
+                <a asp-action="Logout" asp-controller="Account">Выйти</a>
+            </div>
+        </div>
+    </nav>
+}
+
+<div class="container h-100 w-100">
+    <div class="row m-0">
+        <div class="col-4">
+            <div class="p-3 h-100 align-self-stretch"
+            style="background-color: #263145; border-radius: 10px;">
+                <div class="row justify-content-center m-0 mb-3">
+                    <a class="btn text-white" style="background-color: #3B4762;">Навигация</a>
+                </div>
+                <div class="navigation_divider"></div>
+                <div class="row justify-content-center m-0 mb-3">
+                    <a asp-action="Student" asp-controller="Home" class="btn text-white" style="background-color: #3B4762;">На главную страницу</a>
+                </div>
+                <div class="row justify-content-center m-0 mb-3" style="overflow: auto; max-height: 200px;">
+                @foreach (var order in Model)
+                {
+                    <div class="row justify-content-center m-0 mb-3">
+                        <a asp-action="Orders" asp-controller="Home" asp-route-orderIndex="@HashHelper.Shifrovka(order.OrderCode, secureKey)" class="btn text-white"
+                            style="background-color: #3B4762;">
+                            Приказ №@order.OrderCode
+                        </a>
+                    </div>
+                }
+                </div>
+            </div>
+        </div>
+        <div class="col-8" style="border-radius: 10px;">
+            <div class="p-4 align-self-stretch" style="min-height: 400px; background-color: #263145; border-radius: 10px;">
+                <div class="row fs-4 mb-4 text-white">
+                    <p>Информация о приказах:</p>
+                </div>
+                @if(Model.Count <= 0)
+                {
+                    <div class="row fs-3 mb-4 text-white text-center">
+                        <p>У вас пока нет приказов</p>
+                    </div>
+                }
+                else
+                {
+                    <div class="row gx-4 mb-3 text-white">
+                        <div class="col-4">
+                            <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model[currentIndex.Value].IdStudent" />
+                            <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Уникальный идентификатор студента</label>
+                        </div>
+                        <div class="col-4">
+                            <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model[currentIndex.Value].OrderCode" />
+                            <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Номер приказа</label>
+                        </div>
+                            <div class="col-4">
+                            <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model[currentIndex.Value].OrderDate.Value.Date.ToString("D")" />
+                            <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Дата приказа</label>
+                        </div>
+                    </div>
+                    <div class="row gx-4 mb-3 text-white">
+                        <div class="col">
+                            <input class="form-control border-0 text-white text-center" style="background-color: #3B4762;" type="text" readonly value="@Model[currentIndex.Value].Order" />
+                            <label class="form-label d-flex justify-content-center" style="font-size: 14px;">Формулировка приказа</label>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function clickOnOrders(id, code, date, text) {
+        document.getElementById('IdStudent').innerHTML = id;
+        document.getElementById('OrderCode').innerHTML = code;
+        document.getElementById('OrderDate').innerHTML = date;
+        document.getElementById('Order').innerHTML = text;
+    }
+</script>

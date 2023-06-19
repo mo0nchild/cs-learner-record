@@ -110,6 +110,12 @@ namespace HttpProxyService.Migrations
                             MethodInfoId = 6,
                             Name = "EmployeeSetMark",
                             RequestPath = "employee_info/setmark"
+                        },
+                        new
+                        {
+                            MethodInfoId = 7,
+                            Name = "EmployeeMarksList",
+                            RequestPath = "employee_info/markslist"
                         });
                 });
 

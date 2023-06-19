@@ -1,0 +1,70 @@
+﻿@model ClientWeb.Models.LoginModel
+
+@{
+    ViewData["Title"] = "Авторизация";
+}
+
+@section Header {
+    <div class="header_section">
+        <div class="header_logo">
+            <img src="~/img/vstu-logo.svg" alt="">
+        </div>
+        <div class="header_title">
+            <div class="header_divider"> </div>
+            <div class="header_portal_title">
+                <p>ОБРАЗОВАТЕЛЬНЫЙ ПОРТАЛ ВОРОНЕЖСКОГО ГОСУДАРСТВЕННОГО ТЕХНИЧЕСКОГО УНИВЕРСИТЕТА</p>
+            </div>
+        </div>
+    </div>
+    <div class="header_section">
+        <div class="header_account">
+            <a class="navbar-account" asp-area="" asp-controller="Account" asp-action="Login">
+                Личный кабинет
+            </a>
+        </div>
+    </div>
+}
+<div class="login-box">
+    <form class="login" asp-action="Login" asp-controller="Account" asp-anti-forgery="true">
+        <h3 class="text-center">Авторизация</h3>
+
+        <p class="info-label">Логин / адрес электронной почты</p>
+        <div class="form-group">
+            <input asp-for="Login" class="form-control item" type="text" name="login" placeholder="Введите логин" maxlength="50" minlength="4" pattern="^[a-zA-Z0-9_.-]*$" id="login" required>
+        </div>
+        <p class="info-label">Пароль</p>
+
+        <div class="form-group input-group mb-4">
+            <input asp-for="Password" class="form-control item" type="password" name="password" placeholder="Введите пароль" minlength="4" id="password" required>
+            <button class="btn btn-outline-secondary" type="button" id="button-password">
+                <i id="password-icon" class="bi bi-eye-slash-fill"></i>
+            </button>
+        </div>
+        <div class="form-group">
+            <button class="login-btn" type="submit">Войти</button>
+        </div>
+        <div class="editor-label">
+            @Html.ValidationSummary()
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+
+<script type="text/javascript">
+    $(this.document).ready(function() {
+        var changeClass = (added, deleted) => {
+            $('#password-icon').addClass(added); $('#password-icon').removeClass(deleted);
+        };
+        var isPasswordHide = false;
+        $('#button-password').click(function(){
+            if(isPasswordHide == false) {
+                $('#password').attr('type', 'text'); changeClass('bi-eye-fill', 'bi-eye-slash-fill');
+            }
+            else { $('#password').attr('type', 'password'); changeClass('bi-eye-slash-fill', 'bi-eye-fill'); }
+            isPasswordHide = !isPasswordHide;
+        });
+    });
+</script>
+
+}

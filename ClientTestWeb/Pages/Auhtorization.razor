@@ -1,0 +1,185 @@
+﻿@using TransferLibrary.Export
+@using TransferLibrary.NetworkTransfer
+@using Microsoft.AspNetCore.Mvc.RazorPages
+@using Microsoft.AspNetCore.Mvc
+@using Microsoft.Extensions.Hosting
+@using Microsoft.Extensions.DependencyInjection
+
+@page "/"
+@layout ClientTestWeb.Shared.MainLayout
+@inject ILogger<Auhtorization> Logger
+@inject IJSRuntime JS
+
+<link href="/css/Authorization.css" rel="stylesheet" type="text/css">
+<PageTitle>Authorization</PageTitle>
+
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css?family=Raleway:300,400,600" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+    <title>=]</title>
+</head>
+<body>
+    <main class="my-form">
+        <div class="cotainer">
+            <div class="row justify-content-center">
+                @if(!is_loading){
+                        <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">Авторизация</div>
+                            <div class="card-body">
+                                <div class="form-group row">
+                                    <label for="full_name" class="col-md-4 col-form-label text-md-right">Login</label>
+                                    <div class="col-md-6">
+                                        <input type="text" id="full_name" class="form-control" @bind-value="login" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
+                                    </div>
+                                </div>
+                                <div class="form-group row">
+                                    <label for="email_address" class="col-md-4 col-form-label text-md-right">Password</label>
+                                    <div class="col-md-6">
+                                        <input type="password" id="email_address" class="form-control" @bind-value="password" autocomplete="off" readonly onfocus="this.removeAttribute('readonly')">
+                                    </div>
+                                </div>
+                                <div class="col-md-6 offset-md-4">
+                                    <button type="submit" class="btn btn-primary" @onclick="Authorizate">Войти</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else{
+                    <div class="col-md-8">
+                    <div class="card">
+                        <div class="card-header">Авторизация</div>
+                        <div class="card-body">
+                            <p>Загружается</p>
+                            <div class="loader loader--style5" title="Загрузка">
+                                <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+                                    width="24px" height="30px" viewBox="0 0 24 30" style="enable-background:new 0 0 50 50;" xml:space="preserve">
+                                <rect x="0" y="0" width="4" height="10" fill="#333">
+                                    <animateTransform attributeType="xml"
+                                    attributeName="transform" type="translate"
+                                    values="0 0; 0 20; 0 0"
+                                    begin="0" dur="0.6s" repeatCount="indefinite" />
+                                </rect>
+                                <rect x="10" y="0" width="4" height="10" fill="#333">
+                                    <animateTransform attributeType="xml"
+                                    attributeName="transform" type="translate"
+                                    values="0 0; 0 20; 0 0"
+                                    begin="0.2s" dur="0.6s" repeatCount="indefinite" />
+                                </rect>
+                                <rect x="20" y="0" width="4" height="10" fill="#333">
+                                    <animateTransform attributeType="xml"
+                                    attributeName="transform" type="translate"
+                                    values="0 0; 0 20; 0 0"
+                                    begin="0.4s" dur="0.6s" repeatCount="indefinite" />
+                                </rect>
+                                </svg>
+                            </div>
+                            <div>
+                                <button class="btn btn-primary"@onclick="()=>{ is_loading = false; }">Отмена</button>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </main>
+</body>
+</html>
+
+@inject NavigationManager navigation
+@inject Blazored.SessionStorage.ISessionStorageService sessionStorage
+
+@code {
+    private System.String login = System.String.Empty;
+    private System.String password = System.String.Empty;
+    private System.Boolean is_loading = false;
+
+    [Parameter] public Guid urlGuid { get; set; } = Guid.NewGuid();
+    [Parameter] public List<Dictionary<System.String, System.Object>>[]? DataPackage { get; set; } 
+        = new List<Dictionary<System.String, System.Object>>[2];
+
+    protected IRabbitTransfer TransferController { get; private set; } = default!;
+    protected override void OnInitialized()
+    {
+        //ExportTransfer.RabbitHostname = "localhost";
+        //ExportTransfer.HttpHostname = "http://localhost/Institute/hs/student_info";
+
+        this.TransferController = Host.CreateDefaultBuilder()
+            .ConfigureServices((collection) => collection.AddLogging().AddHttpClient().AddNetworkTransfer())
+            .Build().Services.GetService<IRabbitTransfer>()!;
+    }
+
+    private async void Authorizate()
+    {
+        var cancel_sourse = new CancellationTokenSource();
+        this.is_loading = true;
+
+        var loading_task = Task.Run(() => {
+            while(true)
+            {
+                Task.Delay(500).Wait();
+                if(!is_loading) { cancel_sourse.Cancel(); this.is_loading = false; return; }
+            }
+        });
+        var request_task = Task.Run(() =>
+        {
+            Console.WriteLine($"Логин: {login} пароль {password}");
+            if ((login == System.String.Empty) || (password == System.String.Empty)) return;
+
+            var message = new Dictionary<string, object>()
+            {
+                { "request_type", "authorization" }, { "Логин", login }, { "Пароль", password }
+            };
+            try {
+                //var result = this.TransferController.SendMessage("InputExchange", "OutputExchange", message, 
+                //    cancel_sourse.Token);
+                //if (result.Result == null) return;
+
+                //foreach (var item in result.Result.JsonRecord)
+                //{
+                //    foreach (var record in item) this.Logger.LogInformation($"{record.Key}: {record.Value}");
+                //    this.Logger.LogInformation($"\n");
+                //}
+                //DataPackage![0] = result.Result.JsonRecord;
+            }
+            catch (AggregateException error) when (error.InnerException is TransferException)
+            {
+                this.Logger.LogInformation($"{error.Message}");
+                JS.InvokeVoidAsync("invoke_exception", error.Message).AsTask().Wait();
+
+                this.is_loading = false; navigation.NavigateTo("/", true);
+                return;
+            }
+            var messageDiscipline = new Dictionary<string, object>
+            {
+                { "request_type", "statements" }, { "Код", DataPackage![0][0]["Код"] }
+            };
+            List<Dictionary<string, object>> result_messageD = default!;
+            try {
+                //var resultDiscipline = this.TransferController.SendMessage("InputExchange", "OutputExchange", 
+                //    messageDiscipline, cancel_sourse.Token);
+                //if (resultDiscipline.Result == null) return;
+
+                //result_messageD = resultDiscipline!.Result!.JsonRecord;
+            }
+            catch(AggregateException error) when (error.InnerException is TransferException)
+            {
+                this.Logger.LogInformation($"{error.Message}");
+            }
+            DataPackage![1] = result_messageD;
+
+            sessionStorage.SetItemAsync("DataPackage", DataPackage).AsTask().Wait();
+            navigation.NavigateTo("/StudentInfo/" + urlGuid);
+        });
+
+        await loading_task;
+        await request_task;
+    }
+    
+}

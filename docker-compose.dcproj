@@ -4,7 +4,9 @@
     <ProjectVersion>2.1</ProjectVersion>
     <DockerTargetOS>Linux</DockerTargetOS>
     <ProjectGuid>615f2757-f1d0-4b6c-a8c9-8d4783e5ebbe</ProjectGuid>
-	  <DockerComposeProjectName>1clearner-record</DockerComposeProjectName>
+    <DockerComposeProjectName>1clearner-record</DockerComposeProjectName>
+    <DockerLaunchAction>LaunchBrowser</DockerLaunchAction>
+    <DockerServiceUrl>{Scheme}://localhost:{ServicePort}</DockerServiceUrl>
   </PropertyGroup>
   <ItemGroup>
     <None Include="docker-compose.override.yml">
